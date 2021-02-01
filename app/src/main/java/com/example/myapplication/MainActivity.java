@@ -69,17 +69,21 @@ public class MainActivity extends AppCompatActivity implements Session.RouteList
     int index = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        p.add(new Point(54.769679, 32.095323));
+        MapKitFactory.setApiKey(MAPKIT_API_KEY);
+        MapKitFactory.initialize(this);
+        TransportFactory.initialize(this);
+        setContentView(R.layout.activity_main);
+        super.onCreate(savedInstanceState);
+        mapView = findViewById(R.id.mapview);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},1);
         }
         else {
-            p.add(new Point(54.769679, 32.095323));
-            MapKitFactory.setApiKey(MAPKIT_API_KEY);
-            MapKitFactory.initialize(this);
-            TransportFactory.initialize(this);
-            setContentView(R.layout.activity_main);
-            super.onCreate(savedInstanceState);
-            mapView = findViewById(R.id.mapview);
+            LocationManager ma  = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            while (!ma.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+                new AlertDialog.Builder(this).setTitle("и че мы сюда смотрим?").setMessage("ГДЕ МОЯ ГЕОЛОКАЦИЯ?").show();
+            }
             LocationListener l = new LocationListener() {
                 @Override
                 public void onLocationChanged(@NonNull Location location) {
@@ -93,7 +97,6 @@ public class MainActivity extends AppCompatActivity implements Session.RouteList
                             null);
                 }
             };
-            LocationManager ma = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
             ma.requestLocationUpdates(ma.GPS_PROVIDER, 0, 0, l);
         }
     }
